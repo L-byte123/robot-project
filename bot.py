@@ -58,6 +58,8 @@ class ChatBot:
         self.save_history()
 
         return robot_reply
+    def get_history(self):
+        return self.messages
 
     def clear_history(self):
         self.messages = []

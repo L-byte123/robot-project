@@ -14,5 +14,13 @@
     {
         "role": "assistant",
         "content": "Python 的**字典（dict）**是一种**键值对（key-value）**的数据结构。\n\n## 1. 它是什么\n字典就像一本真正的“字典”：\n- 你先知道一个**词**（键 key）\n- 再查到这个词对应的**解释**（值 value）\n\n在 Python 里，字典用来把“名字”和“信息”一一对应起来。\n\n---\n\n## 2. 基本写法\n```python\nperson = {\n    \"name\": \"Alice\",\n    \"age\": 20,\n    \"city\": \"Beijing\"\n}\n```\n\n### 这段代码的意思\n- `person`：变量名\n- `{ ... }`：表示这是一个字典\n- `\"name\": \"Alice\"`：键是 `\"name\"`，值是 `\"Alice\"`\n- `\"age\": 20`：键是 `\"age\"`，值是 `20`\n- `\"city\": \"Beijing\"`：键是 `\"city\"`，值是 `\"Beijing\"`\n\n---\n\n## 3. 如何访问字典里的值\n```python\nprint(person[\"name\"])\n```\n\n输出：\n```python\nAlice\n```\n\n### 解释\n- `person[\"name\"]` 表示取出键 `\"name\"` 对应的值\n- 如果键不存在，会报错\n\n---\n\n## 4. 如何修改字典\n```python\nperson[\"age\"] = 21\n```\n\n### 解释\n- 把键 `\"age\"` 对应的值改成 `21`\n\n---\n\n## 5. 如何添加新键值对\n```python\nperson[\"job\"] = \"teacher\"\n```\n\n### 解释\n- 如果 `\"job\"` 这个键原来不存在，就会新增这一项\n\n---\n\n## 6. 如何删除\n```python\ndel person[\"city\"]\n```\n\n### 解释\n- 删除键 `\"city\"` 以及它对应的值\n\n---\n\n## 7. 字典的特点\n### 优点\n- 查找速度快\n- 很适合存储“名称 -> 信息”的关系\n\n### 特点\n- 键必须是**不可变类型**，比如：\n  - 字符串 `str`\n  - 数字 `int`\n  - 元组 `tuple`\n- 值可以是任何类型，比如：\n  - 字符串\n  - 数字\n  - 列表\n  - 另一个字典\n\n---\n\n## 8. 一个更完整的例子\n```python\nstudent = {\n    \"name\": \"Tom\",\n    \"scores\": [90, 85, 88],\n    \"is_pass\": True\n}\n\nprint(student[\"scores\"])\n```\n\n### 解释\n- `\"scores\"` 对应的值是一个列表 `[90, 85, 88]`\n- `\"is_pass\"` 对应的值是布尔值 `True`\n\n---\n\n## 9. 常用方法\n```python\nperson.keys()    # 查看所有键\nperson.values()  # 查看所有值\nperson.items()   # 查看所有键值对\n```\n\n---\n\n如果你愿意，我还可以继续给你讲：\n1. **字典和列表的区别**\n2. **字典常用方法**\n3. **字典的实际练习题**"
+    },
+    {
+        "role": "user",
+        "content": "退出"
+    },
+    {
+        "role": "assistant",
+        "content": "好的，退出了。  \n如果以后还想继续学习 Python，随时来找我。"
     }
 ]
