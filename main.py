@@ -1,13 +1,11 @@
 from dotenv import load_dotenv
-from openai import OpenAI
+from bot import ChatBot
 
 load_dotenv()
 
-client = OpenAI()
+bot = ChatBot()
 
 print("AI 机器人启动成功！")
-
-messages = []
 
 while True:
     user_input = input("你：")
@@ -16,25 +14,6 @@ while True:
         print("机器人：再见！")
         break
 
-    messages.append(
-        {
-            "role": "user",
-            "content": user_input
-        }
-    )
+    reply = bot.ask(user_input)
 
-    response = client.responses.create(
-        model="gpt-5.4-mini",
-        input=messages
-    )
-
-    robot_reply = response.output_text
-
-    print("机器人：", robot_reply)
-
-    messages.append(
-        {
-            "role": "assistant",
-            "content": robot_reply
-        }
-    )
+    print("机器人：", reply)
