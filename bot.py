@@ -51,3 +51,8 @@ class ChatBot:
         self.save_history()
 
         return robot_reply
+    def clear_history(self):
+    self.messages = []
+
+    if os.path.exists(self.history_file):
+        os.remove(self.history_file)
