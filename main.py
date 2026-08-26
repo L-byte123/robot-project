@@ -14,9 +14,9 @@ while True:
         print("机器人：再见！")
         break
     if user_input == "/clear":
-    bot.clear_history()
-    print("机器人：聊天记录已清空。")
-    continue
+       bot.clear_history()
+       print("机器人：聊天记录已清空。")
+       continue
     reply = bot.ask(user_input)
 
     print("机器人：", reply)
