@@ -10,6 +10,12 @@ class ChatBot:
         self.history_file = "chat_history.json"
         self.messages = self.load_history()
 
+        self.system_prompt = """
+你是一个耐心的 Python 学习助手。
+回答尽量清楚。
+遇到代码时要解释每一部分的作用。
+"""
+
     def load_history(self):
         if not os.path.exists(self.history_file):
             return []
@@ -36,6 +42,7 @@ class ChatBot:
 
         response = self.client.responses.create(
             model="gpt-5.4-mini",
+            instructions=self.system_prompt,
             input=self.messages
         )
 
@@ -51,9 +58,9 @@ class ChatBot:
         self.save_history()
 
         return robot_reply
-    
+
     def clear_history(self):
         self.messages = []
 
         if os.path.exists(self.history_file):
-           os.remove(self.history_file)
+            os.remove(self.history_file)
