@@ -1,5 +1,7 @@
 import json
 import os
+from config import MODEL_NAME, HISTORY_FILE, SYSTEM_PROMPT
+
 
 from openai import (
     OpenAI,
@@ -13,15 +15,10 @@ from openai import (
 class ChatBot:
     def __init__(self):
         self.client = OpenAI()
-        self.history_file = "chat_history.json"
+        self.history_file = HISTORY_FILE
         self.messages = self.load_history()
 
-        self.system_prompt = """
-你是一个耐心的 Python 学习助手。
-回答尽量清楚。
-遇到代码时要解释每一部分的作用。
-"""
-
+        self.system_prompt = SYSTEM_PROMPT
     def load_history(self):
         if not os.path.exists(self.history_file):
             return []
@@ -57,7 +54,7 @@ class ChatBot:
 
         try:
             response = self.client.responses.create(
-                model="gpt-5.4-mini",
+                model=MODEL_NAME,
                 instructions=self.system_prompt,
                 input=self.messages
             )
