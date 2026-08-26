@@ -1,10 +1,30 @@
+import json
+import os
+
 from openai import OpenAI
 
 
 class ChatBot:
     def __init__(self):
         self.client = OpenAI()
-        self.messages = []
+        self.history_file = "chat_history.json"
+        self.messages = self.load_history()
+
+    def load_history(self):
+        if not os.path.exists(self.history_file):
+            return []
+
+        with open(self.history_file, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    def save_history(self):
+        with open(self.history_file, "w", encoding="utf-8") as file:
+            json.dump(
+                self.messages,
+                file,
+                ensure_ascii=False,
+                indent=4
+            )
 
     def ask(self, user_input):
         self.messages.append(
@@ -27,5 +47,7 @@ class ChatBot:
                 "content": robot_reply
             }
         )
+
+        self.save_history()
 
         return robot_reply

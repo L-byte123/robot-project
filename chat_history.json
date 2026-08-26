@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "你是谁？"
+    },
+    {
+        "role": "assistant",
+        "content": "我是 ChatGPT，一个由 OpenAI 训练的 AI 助手。  \n我可以帮你回答问题、写作、翻译、总结、编程、头脑风暴等。\n\n如果你愿意，也可以直接告诉我你想做什么。"
+    }
+]
