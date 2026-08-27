@@ -15,7 +15,7 @@ logger = get_logger()
 
 
 class ChatBot:
-    def __init__(self，session_name="default"):
+    def __init__(self, session_name="default"):
         self.client = OpenAI()
         self.storage = ChatStorage(session_name)
         self.messages = self.storage.load()
@@ -48,7 +48,15 @@ class ChatBot:
                 }
             )
 
-            self.storage.save(self.messages)
+            self.storage.save_message(
+                "user",
+                user_input
+            )
+
+            self.storage.save_message(
+                "assistant",
+                robot_reply
+            )
 
             return robot_reply
 
@@ -60,12 +68,12 @@ class ChatBot:
         except APIConnectionError:
             self.messages.pop()
             logger.error("OpenAI API 连接失败")
-            return "无法连接到 AI 服务，请检查网络后重试。"
+            return "无法连接到 AI 服务，请检查网络。"
 
         except RateLimitError:
             self.messages.pop()
             logger.warning("OpenAI API 触发速率限制")
-            return "请求过于频繁或当前 API 额度受限，请稍后再试。"
+            return "请求过于频繁或额度受限，请稍后再试。"
 
         except APIStatusError as error:
             self.messages.pop()
@@ -74,16 +82,11 @@ class ChatBot:
                 f"OpenAI API 状态错误：{error.status_code}"
             )
 
-            return (
-                f"AI 服务返回错误，"
-                f"状态码：{error.status_code}"
-            )
+            return f"AI 服务返回错误，状态码：{error.status_code}"
 
         except Exception:
             self.messages.pop()
-
             logger.exception("发生未知异常")
-
             return "程序发生未知错误，请稍后再试。"
 
     def get_history(self):
