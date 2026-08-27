@@ -27,9 +27,17 @@ while True:
 /history   查看聊天记录
 /clear     清空聊天记录
 /exit      退出程序
+/about     关于本程序
 """)
         continue
+    if user_input == "/about":
+       print(f"""
+             {BOT_NAME}
 
+这是一个使用 Python 和 OpenAI API 开发的聊天机器人。
+支持连续对话、聊天记录、日志、配置系统和命令系统。
+""")
+    continue
     if user_input == "/history":
         history = bot.get_history()
 
