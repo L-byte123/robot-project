@@ -6,7 +6,9 @@ from config import BOT_NAME
 
 load_dotenv()
 
-bot = ChatBot()
+current_session = "default"
+
+bot = ChatBot(current_session)
 
 print(f"{BOT_NAME} 启动成功！")
 print("输入 /help 查看可用命令。")
@@ -27,6 +29,10 @@ while True:
 /history   查看聊天记录
 /clear     清空聊天记录
 /exit      退出程序
+/session   查看当前会话
+/new       新建会话
+/switch    切换会话
+
 """)
         continue
 
@@ -63,3 +69,19 @@ while True:
     reply = bot.ask(user_input)
 
     print(f"{BOT_NAME}：{reply}")
+    if user_input == "/session":
+       print(f"当前会话：{current_session}")
+    continue
+
+    if user_input.startswith("/new "):
+      session_name = user_input[5:].strip()
+
+    if session_name == "":
+        print("请输入会话名称。")
+        continue
+
+    current_session = session_name
+    bot = ChatBot(current_session)
+
+    print(f"已创建并切换到会话：{current_session}")
+    continue                

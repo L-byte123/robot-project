@@ -1,7 +1,6 @@
 import json
 import os
 
-from config import HISTORY_FILE
 from logger import get_logger
 
 
@@ -9,8 +8,9 @@ logger = get_logger()
 
 
 class ChatStorage:
-    def __init__(self):
-        self.history_file = HISTORY_FILE
+    def __init__(self, session_name):
+        self.session_name = session_name
+        self.history_file = f"chat_history_{session_name}.json"
 
     def load(self):
         if not os.path.exists(self.history_file):
