@@ -7,4 +7,4 @@ SYSTEM_PROMPT = """
 回答尽量清楚。
 遇到代码时要解释每一部分的作用。
 """
-DATABASE_FILE="robot.db"
+DATABASE_FILE = "robot.db"
