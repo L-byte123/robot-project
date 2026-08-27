@@ -15,11 +15,12 @@ logger = get_logger()
 
 
 class ChatBot:
-    def __init__(self):
+    def __init__(self，session_name="default"):
         self.client = OpenAI()
-        self.storage = ChatStorage()
+        self.storage = ChatStorage(session_name)
         self.messages = self.storage.load()
         self.system_prompt = SYSTEM_PROMPT
+        self.session_name = session_name
 
     def ask(self, user_input):
         self.messages.append(
