@@ -8,31 +8,87 @@ logger = get_logger()
 
 
 class ChatStorage:
-    def __init__(self, session_name):
+    def __init__(self, session_name, database_file=None):
         self.session_name = session_name
-        self.database_file = DATABASE_FILE
+        self.database_file = database_file or DATABASE_FILE
 
-        self.create_table()
+        self.create_tables()
 
     def connect(self):
-        return sqlite3.connect(self.database_file)
+        connection = sqlite3.connect(self.database_file)
+        connection.execute("PRAGMA foreign_keys = ON")
+        return connection
 
-    def create_table(self):
+    def create_tables(self):
         try:
             with self.connect() as connection:
+                columns = connection.execute("PRAGMA table_info(messages)").fetchall()
+                if columns and "session" in {column[1] for column in columns}:
+                    self._migrate_legacy_messages(connection)
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS sessions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL UNIQUE,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
                 connection.execute(
                     """
                     CREATE TABLE IF NOT EXISTS messages (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        session TEXT NOT NULL,
+                        session_id INTEGER NOT NULL,
                         role TEXT NOT NULL,
-                        content TEXT NOT NULL
+                        content TEXT NOT NULL,
+                        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
                     )
                     """
                 )
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id)")
+                self._ensure_session(connection)
 
         except Exception:
             logger.exception("创建数据库表失败")
+            raise
+
+    def _migrate_legacy_messages(self, connection):
+        connection.execute("ALTER TABLE messages RENAME TO messages_legacy")
+        connection.execute("""
+            CREATE TABLE sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        connection.execute("INSERT OR IGNORE INTO sessions (name) SELECT DISTINCT session FROM messages_legacy")
+        connection.execute("""
+            CREATE TABLE messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id INTEGER NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+            )
+        """)
+        connection.execute("""
+            INSERT INTO messages (id, session_id, role, content)
+            SELECT m.id, s.id, m.role, m.content
+            FROM messages_legacy AS m JOIN sessions AS s ON s.name = m.session
+        """)
+        connection.execute("DROP TABLE messages_legacy")
+
+    def _ensure_session(self, connection):
+        connection.execute("INSERT OR IGNORE INTO sessions (name) VALUES (?)", (self.session_name,))
+
+    def _session_id(self, connection):
+        self._ensure_session(connection)
+        return connection.execute("SELECT id FROM sessions WHERE name = ?", (self.session_name,)).fetchone()[0]
 
     def load(self):
         try:
@@ -41,10 +97,10 @@ class ChatStorage:
                     """
                     SELECT role, content
                     FROM messages
-                    WHERE session = ?
+                    WHERE session_id = ?
                     ORDER BY id ASC
                     """,
-                    (self.session_name,)
+                    (self._session_id(connection),)
                 )
 
                 rows = cursor.fetchall()
@@ -71,17 +127,21 @@ class ChatStorage:
                 connection.execute(
                     """
                     INSERT INTO messages (
-                        session,
+                        session_id,
                         role,
                         content
                     )
                     VALUES (?, ?, ?)
                     """,
                     (
-                        self.session_name,
+                        self._session_id(connection),
                         role,
                         content
                     )
+                )
+                connection.execute(
+                    "UPDATE sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (self._session_id(connection),)
                 )
 
         except Exception:
@@ -93,9 +153,9 @@ class ChatStorage:
                 connection.execute(
                     """
                     DELETE FROM messages
-                    WHERE session = ?
+                    WHERE session_id = ?
                     """,
-                    (self.session_name,)
+                    (self._session_id(connection),)
                 )
 
         except Exception:

@@ -30,6 +30,9 @@ Robot Project 是一个用于学习 Python 和软件工程开发流程的 AI 聊
 - 日志系统
 - 配置系统
 - 命令系统
+- 独立命令路由
+- 会话创建、切换、查看和删除
+- SQLite 关系型数据库与外键
 - pytest 自动测试
 
 ## 项目结构
@@ -37,12 +40,18 @@ Robot Project 是一个用于学习 Python 和软件工程开发流程的 AI 聊
 ```text
 robot-project/
 ├── main.py
+├── commands.py
+├── session_manager.py
 ├── bot.py
 ├── storage.py
 ├── config.py
 ├── logger.py
 ├── requirements.txt
 ├── tests/
+│   ├── conftest.py
+│   ├── test_bot.py
+│   ├── test_commands.py
+│   ├── test_session_manager.py
 │   └── test_storage.py
 ├── .gitignore
 └── README.md
@@ -50,7 +59,9 @@ robot-project/
 
 ### 文件说明
 
-- `main.py`：程序入口，负责用户输入和命令处理。
+- `main.py`：程序入口，只负责输入循环和普通聊天。
+- `commands.py`：命令路由与命令分发。
+- `session_manager.py`：会话的创建、查询、切换和删除。
 - `bot.py`：负责 AI 对话和 OpenAI API 调用。
 - `storage.py`：负责聊天记录的读取、保存和删除。
 - `config.py`：保存机器人名称、模型名称和系统提示词。
@@ -140,8 +151,10 @@ python main.py
 | `/history` | 查看聊天记录 |
 | `/clear` | 清空聊天记录 |
 | `/session` | 查看当前会话 |
+| `/sessions` | 查看所有会话及消息数量 |
 | `/new 会话名` | 创建并切换到新会话 |
 | `/switch 会话名` | 切换到指定会话 |
+| `/delete-session 会话名` | 删除指定会话及其消息 |
 | `/exit` | 退出程序 |
 
 ## 使用示例
@@ -184,7 +197,9 @@ logs/app.log
 
 ## 本地数据
 
-以下内容默认不会上传 GitHub：
+SQLite 使用两张关联表：`sessions` 保存唯一会话名和时间字段，`messages` 通过外键关联会话；删除会话时会级联删除其消息。旧版单表数据库会在首次运行时自动迁移并保留记录。
+
+以下本地内容默认不会上传 GitHub：
 
 ```text
 .env
@@ -220,7 +235,9 @@ git push -u origin feature/功能名
 - [x] 多会话
 - [x] 日志系统
 - [x] 自动测试
-- [ ] SQLite 数据库
+- [x] SQLite 数据库
+- [x] 命令路由系统
+- [x] 会话管理器
 - [ ] Web 聊天界面
 - [ ] Docker
 - [ ] GitHub Actions
